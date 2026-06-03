@@ -1,0 +1,243 @@
+site_name: Python 學堂 · 從零到數據分析
+site_description: 從零基礎到數據分析的完整 Python 教學網站。60+ 章節、4+ 個實戰專案、台灣在地化案例。
+site_url: https://nutcelvischen-jpg.github.io/python-learning-site/
+site_author: Elvis Chen · 赫哥
+
+repo_name: nutcelvischen-jpg/python-learning-site
+repo_url: https://github.com/nutcelvischen-jpg/python-learning-site
+edit_uri: edit/main/docs/
+
+copyright: Copyright &copy; 2026 Elvis Chen · MIT License
+
+docs_dir: docs
+
+theme:
+  name: material
+  language: zh
+
+  # Open Design inspired palette
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: deep orange
+      toggle:
+        icon: material/weather-night
+        name: 切換到深色模式
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: deep orange
+      toggle:
+        icon: material/weather-sunny
+        name: 切換到淺色模式
+
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.tracking
+    - navigation.indexes
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+    - content.action.edit
+    - content.action.view
+    - content.footnote.tooltips
+
+  font:
+    text: Noto Sans TC
+    code: JetBrains Mono
+
+  icon:
+    repo: fontawesome/brands/github
+    logo: material/language-python
+
+  favicon: assets/images/favicon.svg
+
+extra_css:
+  - assets/css/extra.css
+  - assets/css/code.css
+
+extra_javascript:
+  - assets/js/custom.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/nutcelvischen-jpg
+      name: GitHub
+  generator: false
+  analytics:
+    feedback:
+      title: 這頁有幫助嗎？
+      ratings:
+        - icon: material/emoticon-happy-outline
+          name: 這頁很讚
+          data: 1
+          note: 謝謝你的支持 🎉
+        - icon: material/emoticon-sad-outline
+          name: 這頁需要改進
+          data: 0
+          note: 感謝回饋，赫哥會改進 ⚡
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+      toc_depth: 3
+  - pymdownx.details
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:mermaid2.fence_mermaid_custom
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji  # noqa
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.caret
+  - pymdownx.tilde
+  - pymdownx.keys
+  - pymdownx.smartsymbols
+  - pymdownx.mark
+  - pymdownx.betterem
+  - pymdownx.magiclink
+  - pymdownx.snippets
+
+plugins:
+  - search:
+      separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+  - include-markdown
+  - mermaid2
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+      htmlmin_opts:
+        remove_comments: true
+      cache_safe: true
+
+nav:
+  - 首頁: index.md
+  - 開始之前: intro.md
+
+  - 🐍 第 0 章 - 環境準備:
+      - 0.1 為什麼學 Python？: chapter0X_setup/01-why-python.md
+      - 0.2 安裝 Python: chapter0X_setup/02-install.md
+      - 0.3 VS Code 設定: chapter0X_setup/03-vscode.md
+      - 0.4 Hello, Python!: chapter0X_setup/04-hello.md
+      - 0.5 怎麼問問題 + Debug: chapter0X_setup/05-how-to-ask.md
+      - 章末小測驗: chapter0X_setup/quiz.md
+
+  - 🧱 第 1 章 - 基礎語法:
+      - 1.1 變數與資料型別: chapter01_basics/01-variables-types.md
+      - 1.2 運算子: chapter01_basics/02-operators.md
+      - 1.3 字串處理: chapter01_basics/03-strings.md
+      - 1.4 串列 list: chapter01_basics/04-list.md
+      - 1.5 字典 dict 與集合 set: chapter01_basics/05-dict-set.md
+      - 1.6 tuple 與不可變: chapter01_basics/06-tuple.md
+      - 1.7 流程控制: chapter01_basics/07-if-else.md
+      - 1.8 迴圈: chapter01_basics/08-loops.md
+      - 1.9 函式: chapter01_basics/09-functions.md
+      - 1.10 串列推導式: chapter01_basics/10-comprehension.md
+      - '小專案: 通訊錄管理': chapter01_basics/project.md
+
+  - 🏗️ 第 2 章 - 進階基礎:
+      - 2.1 檔案讀寫: chapter02_intermediate/01-file-io.md
+      - 2.2 例外處理: chapter02_intermediate/02-exceptions.md
+      - 2.3 模組與套件: chapter02_intermediate/03-modules.md
+      - 2.4 類別與物件: chapter02_intermediate/04-classes.md
+      - 2.5 標準庫必備: chapter02_intermediate/05-stdlib.md
+      - 2.6 虛擬環境 venv: chapter02_intermediate/06-venv.md
+      - 2.7 pip 套件管理: chapter02_intermediate/07-pip.md
+      - 2.8 PEP 8 風格: chapter02_intermediate/08-pep8.md
+      - '小專案: 記帳程式': chapter02_intermediate/project.md
+
+  - 📦 第 3 章 - 環境管理:
+      - 3.1 為什麼要環境隔離: chapter03_env/01-why-venv.md
+      - 3.2 venv 完整教學: chapter03_env/02-venv-deep.md
+      - 3.3 conda 簡介: chapter03_env/03-conda.md
+      - 3.4 requirements.txt: chapter03_env/04-requirements.md
+      - 3.5 poetry / uv 現代化: chapter03_env/05-poetry-uv.md
+
+  - 🔢 第 4 章 - NumPy:
+      - 4.1 NumPy 簡介: chapter04_numpy/01-intro.md
+      - 4.2 ndarray 建立/索引/切片: chapter04_numpy/02-ndarray.md
+      - 4.3 形狀操作: chapter04_numpy/03-shape.md
+      - 4.4 向量化與 broadcasting: chapter04_numpy/04-broadcasting.md
+      - 4.5 統計函式: chapter04_numpy/05-stats.md
+      - 4.6 隨機數與線代: chapter04_numpy/06-random-linalg.md
+
+  - 🐼 第 5 章 - pandas:
+      - 5.1 Series 與 DataFrame: chapter05_pandas/01-intro.md
+      - 5.2 讀寫資料: chapter05_pandas/02-io.md
+      - 5.3 選取資料: chapter05_pandas/03-selection.md
+      - 5.4 資料清理: chapter05_pandas/04-cleaning.md
+      - 5.5 轉換: chapter05_pandas/05-transform.md
+      - 5.6 groupby + agg: chapter05_pandas/06-groupby.md
+      - 5.7 合併: chapter05_pandas/07-merge.md
+      - 5.8 樞紐分析表: chapter05_pandas/08-pivot.md
+      - 5.9 時間序列: chapter05_pandas/09-time-series.md
+      - 5.10 效能優化: chapter05_pandas/10-perf.md
+      - '小專案: 銷售資料分析': chapter05_pandas/project.md
+
+  - 📊 第 6 章 - 視覺化:
+      - 6.1 設計原則: chapter06_viz/01-principles.md
+      - 6.2 matplotlib 基礎: chapter06_viz/02-matplotlib-basics.md
+      - 6.3 圖表類型: chapter06_viz/03-chart-types.md
+      - 6.4 子圖佈局: chapter06_viz/04-subplots.md
+      - 6.5 樣式客製: chapter06_viz/05-style.md
+      - 6.6 seaborn 進階: chapter06_viz/06-seaborn.md
+      - 6.7 plotly 互動: chapter06_viz/07-plotly.md
+      - 6.8 發表品質: chapter06_viz/08-publication.md
+
+  - 📈 第 7 章 - 統計基礎:
+      - 7.1 描述統計: chapter07_stats/01-descriptive.md
+      - 7.2 機率分佈: chapter07_stats/02-distributions.md
+      - 7.3 抽樣與信賴區間: chapter07_stats/03-sampling.md
+      - 7.4 假設檢定: chapter07_stats/04-testing.md
+      - 7.5 相關與迴歸: chapter07_stats/05-correlation-regression.md
+      - 7.6 統計誤用警示: chapter07_stats/06-misuse.md
+
+  - 🎯 第 8 章 - 實戰專案:
+      - 8.1 空氣品質分析: chapter08_projects/01-air-quality.md
+      - 8.2 銷售儀表板: chapter08_projects/02-sales-dashboard.md
+      - 8.3 Threads 文字探勘: chapter08_projects/03-threads-mining.md
+      - 8.4 環境經濟學個案: chapter08_projects/04-env-econ.md
+      - 🆕 8.5 空汙 × 房價實戰: chapter08_projects_extra/05-air-vs-house.md
+
+  - 🚀 第 9 章 - 進階導讀:
+      - 9.1 機器學習路徑: chapter09_advanced/01-ml-path.md
+      - 9.2 進階爬蟲: chapter09_advanced/02-crawling.md
+      - 9.3 部署與分享: chapter09_advanced/03-deploy.md
+
+  - 📎 附錄:
+      - A. 速查表: appendix/A-cheatsheet.md
+      - B. 常見錯誤 FAQ: appendix/B-errors-faq.md
+      - C. 學習資源: appendix/C-resources.md
+      - D. 術語中英對照: appendix/D-glossary.md
+      - E. 練習題答案: appendix/E-answers.md

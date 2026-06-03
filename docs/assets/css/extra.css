@@ -1,0 +1,425 @@
+/* ============================================================
+   Python 學堂 — Custom Design System
+   Inspired by Open Design 0.9.0 (clean + creative)
+   ============================================================ */
+
+/* ---------- Design Tokens ---------- */
+:root {
+  /* Open Design-inspired palette */
+  --md-primary-fg-color:        #1A1A2E;     /* Deep night */
+  --md-primary-bg-color:        #FFFFFF;
+  --md-primary-bg-color--light: #F8F9FB;
+
+  --md-accent-fg-color:         #FF6B35;     /* Creative orange */
+  --md-accent-fg-color--transparent: rgba(255, 107, 53, 0.1);
+  --md-accent-bg-color:         #FFFFFF;
+  --md-accent-bg-color--light:  rgba(255, 107, 53, 0.1);
+
+  /* Python signature */
+  --python-blue:    #3776AB;
+  --python-yellow:  #FFD43B;
+  --creative-orange:#FF6B35;
+  --night-deep:     #0F172A;
+  --paper-white:    #FAFBFC;
+  --ink-gray:       #475569;
+  --line-soft:      #E2E8F0;
+
+  /* Typography */
+  --md-text-font: "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --md-code-font: "JetBrains Mono", "SF Mono", Menlo, monospace;
+}
+
+/* ---------- Hero / Landing ---------- */
+.hero {
+  position: relative;
+  padding: 4rem 2rem 3rem;
+  margin: -1.5rem -1.5rem 2rem;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(55, 118, 171, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(255, 107, 53, 0.12) 0%, transparent 40%),
+    linear-gradient(135deg, #FAFBFC 0%, #FFFFFF 100%);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--line-soft);
+}
+
+.hero h1 {
+  font-size: 3.5rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+  background: linear-gradient(135deg, var(--python-blue) 0%, var(--creative-orange) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 1rem 0 !important;
+  line-height: 1.1 !important;
+}
+
+.hero .lead {
+  font-size: 1.4rem !important;
+  color: var(--ink-gray);
+  max-width: 720px;
+  font-weight: 400;
+}
+
+.hero .badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.hero .badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.75rem;
+  background: white;
+  border: 1px solid var(--line-soft);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  color: var(--ink-gray);
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.hero .badge.python { color: var(--python-blue); border-color: rgba(55, 118, 171, 0.3); }
+.hero .badge.orange { color: var(--creative-orange); border-color: rgba(255, 107, 53, 0.3); }
+
+/* ---------- Card Grid ---------- */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin: 1.5rem 0;
+}
+
+.card {
+  display: block;
+  padding: 1.5rem;
+  background: white;
+  border: 1px solid var(--line-soft);
+  border-radius: 12px;
+  text-decoration: none !important;
+  color: inherit !important;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--python-blue), var(--creative-orange));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s ease;
+}
+
+.card:hover {
+  border-color: var(--python-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(55, 118, 171, 0.12);
+}
+
+.card:hover::before {
+  transform: scaleX(1);
+}
+
+.card .icon {
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.card .title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.4rem 0;
+  color: var(--night-deep);
+}
+
+.card .desc {
+  font-size: 0.9rem;
+  color: var(--ink-gray);
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* ---------- Stat tiles ---------- */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.stat {
+  text-align: center;
+  padding: 1.25rem;
+  background: linear-gradient(135deg, rgba(55, 118, 171, 0.05), rgba(255, 107, 53, 0.05));
+  border-radius: 12px;
+  border: 1px solid var(--line-soft);
+}
+
+.stat .num {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--python-blue);
+  line-height: 1;
+  font-family: var(--md-code-font);
+}
+
+.stat .label {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--ink-gray);
+  font-weight: 500;
+}
+
+/* ---------- Code blocks (kept clean) ---------- */
+.md-typeset pre > code {
+  border-radius: 10px !important;
+  padding: 1rem 1.25rem !important;
+  font-size: 0.85rem !important;
+  line-height: 1.55 !important;
+}
+
+.md-typeset code {
+  font-size: 0.85em;
+  padding: 0.1em 0.4em;
+  background: rgba(55, 118, 171, 0.08);
+  border-radius: 4px;
+}
+
+/* Inline copy button hover */
+.md-clipboard {
+  color: var(--python-blue) !important;
+}
+
+/* ---------- Admonitions (clean color) ---------- */
+.md-typeset .admonition {
+  border-radius: 10px;
+  border-left: 4px solid var(--python-blue);
+  background: rgba(55, 118, 171, 0.03);
+}
+
+.md-typeset .admonition.note,
+.md-typeset .admonition.info {
+  border-left-color: var(--python-blue);
+}
+
+.md-typeset .admonition.warning,
+.md-typeset .admonition.caution {
+  border-left-color: var(--creative-orange);
+}
+
+.md-typeset .admonition.danger,
+.md-typeset .admonition.error {
+  border-left-color: #DC2626;
+}
+
+.md-typeset .admonition.tip,
+.md-typeset .admonition.success {
+  border-left-color: #16A34A;
+}
+
+/* ---------- Headings ---------- */
+.md-typeset h1 {
+  font-weight: 800 !important;
+  letter-spacing: -0.02em;
+}
+
+.md-typeset h2 {
+  font-weight: 700 !important;
+  border-bottom: 2px solid var(--line-soft);
+  padding-bottom: 0.3rem;
+  margin-top: 2.5rem !important;
+}
+
+.md-typeset h3 {
+  font-weight: 700 !important;
+  color: var(--python-blue);
+}
+
+/* ---------- Tables (clean) ---------- */
+.md-typeset table:not([class]) {
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line-soft);
+  font-size: 0.9rem;
+}
+
+.md-typeset table:not([class]) th {
+  background: linear-gradient(135deg, rgba(55, 118, 171, 0.08), rgba(255, 107, 53, 0.05));
+  color: var(--night-deep);
+  font-weight: 700;
+}
+
+.md-typeset table:not([class]) tr:hover {
+  background: rgba(55, 118, 171, 0.04);
+}
+
+/* ---------- Exercise blocks ---------- */
+.exercise {
+  border: 2px dashed var(--creative-orange);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin: 1.5rem 0;
+  background: rgba(255, 107, 53, 0.03);
+}
+
+.exercise > .exercise-title {
+  color: var(--creative-orange);
+  font-weight: 800;
+  font-size: 0.95rem;
+  margin-bottom: 0.5rem;
+  display: block;
+  letter-spacing: 0.05em;
+}
+
+/* ---------- Lesson header (chapter pages) ---------- */
+.lesson-header {
+  margin: -1.5rem -1.5rem 1.5rem;
+  padding: 2rem 1.5rem;
+  background: linear-gradient(135deg, rgba(55, 118, 171, 0.05), rgba(255, 107, 53, 0.03));
+  border-bottom: 1px solid var(--line-soft);
+  border-radius: 0 0 16px 16px;
+}
+
+.lesson-header .chapter-tag {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: var(--python-blue);
+  color: white;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.lesson-header h1 {
+  margin: 0 0 0.5rem 0 !important;
+  background: none !important;
+  -webkit-text-fill-color: var(--night-deep) !important;
+  color: var(--night-deep) !important;
+}
+
+.lesson-header .meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: var(--ink-gray);
+  margin-top: 0.5rem;
+}
+
+/* ---------- Progress bar (top) ---------- */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--python-blue), var(--creative-orange));
+  z-index: 9999;
+  transition: width 0.1s ease;
+}
+
+/* ---------- Tab labels in content ---------- */
+.md-typeset .tabbed-labels > label {
+  font-weight: 600;
+  color: var(--ink-gray);
+}
+
+/* ---------- Keyboard key styling ---------- */
+.md-typeset kbd {
+  background: var(--paper-white);
+  border: 1px solid var(--line-soft);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 0.1em 0.4em;
+  font-family: var(--md-code-font);
+  font-size: 0.85em;
+}
+
+/* ---------- Quote style ---------- */
+.md-typeset blockquote {
+  border-left: 4px solid var(--creative-orange);
+  background: rgba(255, 107, 53, 0.04);
+  border-radius: 0 10px 10px 0;
+  font-style: normal;
+  padding: 0.5rem 1rem;
+}
+
+/* ---------- Selection ---------- */
+::selection {
+  background: rgba(255, 107, 53, 0.25);
+  color: var(--night-deep);
+}
+
+/* ---------- Hide edit/view buttons by default (clean look) ---------- */
+.md-typeset .md-content__button {
+  opacity: 0.4;
+  transition: opacity 0.2s;
+}
+.md-typeset .md-content__button:hover {
+  opacity: 1;
+}
+
+/* ---------- Footer ---------- */
+.md-footer {
+  background: var(--night-deep) !important;
+}
+
+.md-footer-meta {
+  background: rgba(0, 0, 0, 0.3) !important;
+}
+
+/* ---------- Mermaid diagram (clean) ---------- */
+.mermaid {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 10px;
+  border: 1px solid var(--line-soft);
+}
+
+/* ---------- Dark mode (custom) ---------- */
+[data-md-color-scheme="custom-dark"] {
+  --md-default-bg-color: #0F172A;
+  --md-default-fg-color: #E2E8F0;
+  --md-default-fg-color--light: #94A3B8;
+  --md-primary-fg-color: #FF6B35;
+  --md-primary-bg-color: #1E293B;
+  --md-accent-fg-color: #FFD43B;
+  --line-soft: #334155;
+  --paper-white: #1E293B;
+}
+
+[data-md-color-scheme="custom-dark"] .hero {
+  background:
+    radial-gradient(circle at 20% 20%, rgba(55, 118, 171, 0.3) 0%, transparent 40%),
+    radial-gradient(circle at 80% 70%, rgba(255, 107, 53, 0.2) 0%, transparent 40%),
+    linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+}
+
+[data-md-color-scheme="custom-dark"] .card {
+  background: #1E293B;
+  border-color: #334155;
+}
+
+[data-md-color-scheme="custom-dark"] .card .title,
+[data-md-color-scheme="custom-dark"] .stat .label,
+[data-md-color-scheme="custom-dark"] .lesson-header h1 {
+  color: #F1F5F9 !important;
+}
+
+[data-md-color-scheme="custom-dark"] .stat {
+  background: linear-gradient(135deg, rgba(55, 118, 171, 0.15), rgba(255, 107, 53, 0.1));
+}

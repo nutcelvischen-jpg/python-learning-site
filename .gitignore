@@ -1,0 +1,12 @@
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.idea/
+.vscode/
+site/
+.cache/
+.mypy_cache/
+*.egg-info/
+
