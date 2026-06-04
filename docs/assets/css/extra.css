@@ -448,23 +448,10 @@
 }
 
 /* ---------- Sidebar: 章節永遠展開, 不能收合 ---------- */
-/* 隱藏章節標題右邊的折疊箭頭 */
+/* JS (custom.js) 會把所有 .md-nav__toggle checkbox 設為 checked + disabled,
+   這裡只負責把右邊的折疊箭頭藏起來, 視覺上更乾淨 */
+
 .md-sidebar--primary .md-nav__item--section > .md-nav__link::after,
 .md-sidebar--primary .md-nav__item--section > label.md-nav__link::after {
-  display: none !important;
-}
-
-/* 強制章節內的子章節列表永遠展開 (覆寫 toggle 行為) */
-.md-sidebar--primary .md-nav__item--section > .md-nav__list,
-.md-sidebar--primary .md-nav__item--section > input:checked ~ .md-nav__list {
-  display: block !important;
-  max-height: none !important;
-  overflow: visible !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-}
-
-/* 章節標題不能被當成 input (label) toggle */
-.md-sidebar--primary .md-nav__item--section > input[type="checkbox"] {
   display: none !important;
 }

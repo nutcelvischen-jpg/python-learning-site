@@ -16,3 +16,23 @@
     updateProgress();
   });
 })();
+
+/* Sidebar: 永遠展開所有章節, 不能收合
+   mkdocs material 用 <input type=checkbox> + :checked 配 <nav> 顯示
+   我們在 load 時把所有 sidebar 的 checkbox 都打勾,
+   並把章節 input 設為 disabled (讓它不能被點擊 toggle) */
+(function() {
+  function expandAllSidebarSections() {
+    var primary = document.querySelector('.md-sidebar--primary');
+    if (!primary) return;
+    // 把所有章節的 checkbox 都設為 checked + disabled
+    var checkboxes = primary.querySelectorAll('input[type="checkbox"].md-nav__toggle');
+    checkboxes.forEach(function(cb) {
+      cb.checked = true;
+      cb.disabled = true;  // 不能 toggle
+    });
+  }
+  // DOMContentLoaded + load 雙保險
+  document.addEventListener('DOMContentLoaded', expandAllSidebarSections);
+  window.addEventListener('load', expandAllSidebarSections);
+})();
