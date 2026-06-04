@@ -539,5 +539,68 @@
   z-index: 10;
 }
 
+/* ---------- Sidebar splitter: 桌面可拖動調整寬度 ---------- */
+/* 老大需求 2026-06-04: 中間可拖動 splitter
+   - 5px 寬垂直條
+   - 鼠標變 col-resize
+   - 拖動時 sidebar 寬度即時改變
+   - localStorage 記住使用者選擇
+   - 手機不顯示 (維持漢堡 drawer)
+   - mkdocs 預設 .md-main__inner 是 display: flex, 用 flex-basis 不用 grid */
+
+:root {
+  --sidebar-width: 17rem;  /* JS 動態改, 預設 17rem 給中文 */
+  --sidebar-min: 12rem;
+  --sidebar-max: 28rem;
+}
+
+/* 桌面 (≥ 76.25em) splitter 樣式 + 互動 */
+@media (min-width: 76.25em) {
+  /* splitter 本體 */
+  .sidebar-splitter {
+    flex: 0 0 5px !important;        /* 固定 5px 寬 */
+    align-self: stretch !important;
+    background: transparent !important;
+    cursor: col-resize !important;
+    z-index: 6 !important;
+    position: relative !important;
+    transition: background 0.15s !important;
+  }
+  .sidebar-splitter::before {
+    content: "" !important;
+    position: absolute !important;
+    left: 50% !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    transform: translateX(-50%) !important;
+    width: 1px !important;
+    background: rgba(0, 0, 0, 0.12) !important;
+    transition: background 0.15s, width 0.15s !important;
+  }
+  .sidebar-splitter:hover::before,
+  .sidebar-splitter.dragging::before {
+    background: var(--python-blue, #3776AB) !important;
+    width: 2px !important;
+  }
+  /* 拖動時禁用文字選取 */
+  body.sidebar-dragging,
+  body.sidebar-dragging * {
+    user-select: none !important;
+    cursor: col-resize !important;
+  }
+
+  /* 用 flex 控制 sidebar 寬度, 不用 grid (mkdocs 預設是 flex) */
+  .md-sidebar--primary {
+    flex: 0 0 var(--sidebar-width) !important;
+    width: var(--sidebar-width) !important;
+    max-width: var(--sidebar-max) !important;
+    min-width: var(--sidebar-min) !important;
+  }
+  .md-content {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;          /* 防止 flex item 內容撐大 */
+  }
+}
+
 /* 內容區桌面 grid 已在上方 `@media (min-width: 76.25em) { .md-grid }` 處理
    (line ~525, grid-template-columns: 17rem 1fr) */
