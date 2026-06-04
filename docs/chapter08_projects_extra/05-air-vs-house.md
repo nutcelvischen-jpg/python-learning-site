@@ -379,6 +379,221 @@ plt.show()
     4. **跨縣市比較**：把臺中結果跟台北、高雄比對
     5. **加入 PM2.5 長期平均值**：比即時 AQI 更能反映「住家環境品質」
 
+## 🗣️ Step 9.5 — 社群討論文字雲（PTT 八卦版）
+
+最後一個延伸：**抓 PTT 八卦版「空汙/空氣品質/PM2.5」相關討論，用 jieba 切詞 + wordcloud 畫文字雲**，看社會大眾最常把「空汙」跟什麼議題綁在一起。
+
+!!! warning "2026 年 PTT 爬蟲現況"
+
+    PTT 八卦版從 2023 年起實作嚴格連線限制 + over18 cookie 驗證。
+
+    簡單爬蟲很容易被 ban 403。本節範例用以下對策：
+
+    1. 帶 `Cookie: over18=1`（必須，否則被擋）
+    2. 加 `User-Agent`（模仿瀏覽器，否則被擋）
+    3. 用 `requests.Session()` 保持連線
+    4. 每抓一篇文章 `time.sleep(0.5)` 節流
+    5. 抓 30-50 篇就好，不要貪多
+
+    若 PTT 改版失效，可改抓 **Mobile01 房產板**（無 18+）或**新聞媒體 RSS**。
+
+### 9.5.1 安裝套件
+
+```bash
+pip install requests beautifulsoup4 jieba wordcloud
+```
+
+### 9.5.2 爬 PTT 八卦版 — 抓「空汙」相關文章
+
+```python
+"""
+ptt_air_wordcloud.py
+PTT 八卦版「空汙」相關文章爬蟲 → 文字雲
+
+⚠️ 教育用途, 請尊重 PTT 站方規範, 不要大量抓取
+"""
+import requests
+from bs4 import BeautifulSoup
+import time
+import re
+
+PTT_BOARD = "Gossiping"
+SEARCH_KEYWORD = "空汙"  # 也可試 "PM2.5", "空氣品質", "中部空汙"
+MAX_ARTICLES = 30  # 抓 30 篇就好
+
+# ① 設定 over18 cookie + User-Agent (關鍵!)
+session = requests.Session()
+session.cookies.set("over18", "1", domain="www.ptt.cc")
+headers = {
+    "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+                  "AppleWebKit/537.36 (KHTML, like Gecko) "
+                  "Chrome/120.0.0.0 Safari/537.36"
+}
+session.headers.update(headers)
+
+# ② 抓文章列表 (PTT 搜尋頁)
+print(f"📥 抓 PTT {PTT_BOARD} 板, 關鍵字「{SEARCH_KEYWORD}」...")
+list_url = f"https://www.ptt.cc/bbs/{PTT_BOARD}/search?q={SEARCH_KEYWORD}"
+resp = session.get(list_url, timeout=15)
+resp.raise_for_status()
+
+soup = BeautifulSoup(resp.text, "html.parser")
+links = soup.select("div.r-ent a")
+print(f"  找到 {len(links)} 篇文章連結")
+
+# ③ 逐篇抓內文
+all_text = []
+for i, link in enumerate(links[:MAX_ARTICLES]):
+    href = link.get("href", "")
+    if not href.startswith("/bbs/"):
+        continue
+    article_url = "https://www.ptt.cc" + href
+    try:
+        r = session.get(article_url, timeout=10)
+        r.raise_for_status()
+        article = BeautifulSoup(r.text, "html.parser")
+
+        # 內文在 #main-content
+        content_div = article.select_one("#main-content")
+        if not content_div:
+            continue
+
+        # 移除推文區
+        for push in article.select("div.push"):
+            push.decompose()
+
+        text = content_div.get_text(separator="\n", strip=True)
+        all_text.append(text)
+        print(f"  ✓ ({i+1}/{MAX_ARTICLES}) {href.split('/')[-1]}")
+        time.sleep(0.5)  # ④ 節流, 不要太快
+    except Exception as e:
+        print(f"  ✗ {href}: {e}")
+        continue
+
+# ⑤ 存原始文字
+with open("ptt_air_articles.txt", "w", encoding="utf-8") as f:
+    f.write("\n\n---\n\n".join(all_text))
+print(f"\n💾 共抓 {len(all_text)} 篇, 存到 ptt_air_articles.txt")
+```
+
+### 9.5.3 jieba 切詞 + wordcloud 畫圖
+
+```python
+"""
+make_wordcloud.py
+讀 ptt_air_articles.txt → jieba 切詞 → 文字雲
+"""
+import jieba
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+import re
+from collections import Counter
+
+# ① 載入文章
+with open("ptt_air_articles.txt", encoding="utf-8") as f:
+    raw = f.read()
+
+# ② 清掉標點符號 / 英文數字 / 推文
+text = re.sub(r"[^\u4e00-\u9fff]+", " ", raw)  # 只留中文
+words = jieba.lcut(text)
+
+# ③ 過濾停用詞
+STOP = {
+    "的", "了", "是", "在", "也", "都", "就", "和", "與", "或",
+    "有", "沒", "沒有", "一個", "一些", "什麼", "怎麼", "為什麼",
+    "我", "你", "他", "她", "它", "我們", "你們", "他們",
+    "這個", "那個", "這樣", "那樣", "可以", "可能",
+    "但", "不過", "因為", "所以", "如果", "雖然",
+    "今天", "明天", "昨天", "現在", "以前", "之後",
+    "https", "http", "com", "www", "ptt", "cc", "html",
+    "推", "噓", "→", "※", "看板", "標題", "時間",
+}
+words = [w for w in words if len(w) >= 2 and w not in STOP]
+
+# ④ 統計
+counter = Counter(words)
+print("📊 Top 20 關鍵字:")
+for word, count in counter.most_common(20):
+    print(f"  {word:8s}  {count:4d}")
+
+# ⑤ 畫文字雲
+# 字型: 從本 repo 拿, 學生可在任何位置, 用相對於此腳本的位置找
+import os
+_FONT = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "..", "docs", "assets", "fonts", "NotoSansTC-Regular.otf"
+)
+# 若找不到, 退回系統中文字型
+if not os.path.exists(_FONT):
+    _FONT = None  # wordcloud 會用系統預設字型, 可能中文變豆腐
+    print("⚠️ 找不到 NotoSansTC-Regular.otf, 改用系統字型 (中文可能變豆腐)")
+
+wc = WordCloud(
+    font_path=_FONT,
+    width=1200,
+    height=600,
+    background_color="white",
+    max_words=200,
+    colormap="viridis",
+).generate_from_frequencies(counter)
+
+plt.figure(figsize=(14, 7))
+plt.imshow(wc, interpolation="bilinear")
+plt.axis("off")
+SEARCH_KEYWORD = "空汙"  # 跟 ptt_air_wordcloud.py 一致
+plt.title(f"PTT「{SEARCH_KEYWORD}」討論文字雲 — Top {len(counter)} 詞",
+          fontsize=15, fontweight="bold", pad=20)
+plt.tight_layout()
+plt.savefig("chart31_ptt_air_wordcloud.png", dpi=120, bbox_inches="tight")
+plt.show()
+print("💾 存成 chart31_ptt_air_wordcloud.png")
+```
+
+### 9.5.4 預期輸出
+
+執行後你會看到類似這樣的 Top 20（依 2026 當下熱門議題浮動）：
+
+```
+📊 Top 20 關鍵字:
+  空汙           142
+  台中           98
+  火力發電       76
+  PM2.5        68
+  咳嗽           54
+  口罩           51
+  經濟部         43
+  環保署         39
+  中火           37
+  肺癌           35
+  ...
+```
+
+⚠️ 詞頻結果會隨抓的時間 / 文章浮動，這是正常的。
+
+### 9.5.5 若 PTT 爬不到 — 替代方案
+
+```python
+# 方案 A: 改抓 Mobile01 房產板 (無 18+ 限制)
+url = "https://www.mobile01.com/topiclist.php?f=291"
+# (示意, 實際 selector 依網站結構而定)
+
+# 方案 B: 抓環境部 RSS 新聞稿
+import feedparser  # pip install feedparser
+url = "https://www.moenv.gov.tw/rss"
+feed = feedparser.parse(url)
+for entry in feed.entries[:30]:
+    print(entry.title, entry.link)
+```
+
+!!! tip "為什麼這個 Step 有價值"
+
+    文字雲把「官方統計 + 鄉民感受」兩個視角綁在一起。
+
+    官方數據：AQI 對房價影響不顯著 (Step 7)
+    鄉民直覺：空汙常常跟「中火、火力發電、咳嗽、肺癌」綁在一起
+
+    兩者對比可以寫進 Step 10 報告的「**研究限制**」或「**延伸討論**」段落。
+
 ## 📝 Step 10 — 寫成完整研究報告
 
 把這個分析包裝成一份**3-5 頁的迷你研究報告**：
