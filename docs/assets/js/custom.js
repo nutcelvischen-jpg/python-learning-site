@@ -24,16 +24,19 @@
      - ⌂ 首頁: 直接回首頁 (a 連結)
      - ✕ 收合: 點下去 toggle drawer (label[for=__drawer], 視覺上跟漢堡按鈕同步)
 
-   注意: 桌面常駐 sidebar 時, 這兩按鈕仍顯示 (一致勝過聰明, 老大要求簡單) */
+   注意: 桌面常駐 sidebar 時, 這兩按鈕仍顯示 (一致勝過聰明, 老大要求簡單)
+
+   改用 MutationObserver 監聽, 處理 Telegram in-app browser / 慢載入情境 */
 (function() {
   function addTopButtons() {
     var sidebar = document.querySelector('.md-sidebar--primary .md-nav--primary');
     if (!sidebar) return;
     if (sidebar.querySelector('.md-sidebar-top-buttons')) return;  // 避免重複
 
-    var siteRoot = document.querySelector('a.md-header__button.md-logo').getAttribute('href') || './';
+    var siteRoot = document.querySelector('a.md-header__button.md-logo');
+    siteRoot = siteRoot ? siteRoot.getAttribute('href') : './';
 
-    // 包在一個 ul 裡, 跟其他 md-nav__item 同級, 視覺一致
+    // 包在一個 li 裡, 跟其他 md-nav__item 同級, 視覺一致
     var container = document.createElement('li');
     container.className = 'md-nav__item md-sidebar-top-buttons';
     container.innerHTML =
@@ -54,6 +57,23 @@
       sidebar.insertBefore(container, sidebar.firstChild);
     }
   }
-  document.addEventListener('DOMContentLoaded', addTopButtons);
-  window.addEventListener('load', addTopButtons);
+
+  // 三重保險: DOMContentLoaded + load + MutationObserver
+  function tryInject() {
+    addTopButtons();
+  }
+  document.addEventListener('DOMContentLoaded', tryInject);
+  window.addEventListener('load', tryInject);
+
+  // MutationObserver: 監聽 sidebar 是否被加進 DOM (處理 SPA-like / 慢載入 / Telegram in-app browser)
+  if (typeof MutationObserver !== 'undefined') {
+    var observer = new MutationObserver(function(mutations) {
+      if (document.querySelector('.md-sidebar--primary .md-nav--primary')) {
+        addTopButtons();
+      }
+    });
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+    // 10 秒後停止觀察 (避免一直跑)
+    setTimeout(function() { observer.disconnect(); }, 10000);
+  }
 })();

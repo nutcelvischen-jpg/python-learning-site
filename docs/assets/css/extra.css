@@ -456,6 +456,26 @@
 @media (max-width: 76.25em) {
   .md-sidebar--primary {
     width: 17rem !important;
+    /* 關鍵: mkdocs 預設 left: -12.1rem + 我們 width: 17rem → 有 4.9rem 露在螢幕外
+       解法: 改 left: 0 + transform: translateX(-100%) → 整個 17rem 完整推離螢幕 */
+    left: 0 !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
+  /* 漢堡按鈕 (input#__drawer) 勾選時, drawer 滑進來 */
+  [data-md-toggle="drawer"]:checked ~ .md-container .md-sidebar--primary {
+    transform: translateX(0) !important;
+  }
+
+  /* drawer 開啟時背景遮罩 */
+  [data-md-toggle="drawer"]:checked ~ .md-overlay {
+    display: block !important;
+  }
+
+  /* 確保漢堡按鈕在 drawer 之上 (z-index 5), 桌面固定看到 */
+  .md-header__button.md-icon[for="__drawer"] {
+    z-index: 10;
   }
 }
 
