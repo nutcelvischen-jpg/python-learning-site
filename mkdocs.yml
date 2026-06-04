@@ -13,7 +13,7 @@ docs_dir: docs
 
 theme:
   name: material
-  language: zh
+  language: zh-Hant
 
   # Open Design inspired palette
   palette:
