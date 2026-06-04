@@ -426,3 +426,23 @@
 [data-md-color-scheme="custom-dark"] .stat {
   background: linear-gradient(135deg, rgba(55, 118, 171, 0.15), rgba(255, 107, 53, 0.1));
 }
+
+/* ---------- Sidebar: 整個課程都展開, 寬度固定 ---------- */
+/* navigation.expand feature 已讓所有章節預設展開 */
+/* 這裡只調整 sidebar 寬度 + 子章節縮排 */
+
+.md-sidebar--primary {
+  width: 280px;
+}
+
+.md-sidebar--primary .md-nav__list .md-nav__list {
+  padding-left: 0.6rem;  /* 子章節縮排 */
+}
+
+/* 桌面寬度時 sidebar 永遠顯示 */
+@media (min-width: 76.25em) {
+  .md-sidebar--primary {
+    display: block !important;
+    visibility: visible !important;
+  }
+}

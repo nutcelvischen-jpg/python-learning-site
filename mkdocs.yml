@@ -33,8 +33,6 @@ theme:
         name: 切換到淺色模式
 
   features:
-    - navigation.tabs
-    - navigation.tabs.sticky
     - navigation.sections
     - navigation.expand
     - navigation.top
