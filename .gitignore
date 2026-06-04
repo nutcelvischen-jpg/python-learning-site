@@ -10,6 +10,3 @@ site/
 .mypy_cache/
 *.egg-info/
 
-# 教材網站字型走 Google Fonts CDN，repo 不打包
-docs/assets/fonts/
-
