@@ -466,61 +466,78 @@
   background: linear-gradient(135deg, rgba(55, 118, 171, 0.15), rgba(255, 107, 53, 0.1));
 }
 
-/* ---------- Sidebar: 桌面/手機統一, 預設完全隱藏 ---------- */
-/* 老大需求: Apple.com 風格
-   - 不管桌面/手機, 預設完全無 sidebar
-   - 主內容拿 100% 寬度
-   - 漢堡按鈕未按時, 畫面只剩主內容 + header ≡
-   - 漢堡按鈕按下, drawer 從左滑出含 11 章節 + 5 附錄 + 開始之前
-   - 每個章節頁最頂部有「⌂ 回首頁」按鈕 (在內容區, 不是 sidebar)
-   - 這裡只負責: 統一 drawer 寬度 + 隱藏邏輯 + 動畫
-   - 桌面 ≥ 76.25em 跟手機 < 76.25em 用同一套 CSS (不再各自分媒體) */
+/* ---------- Sidebar: 桌面釘死永久顯示 + 手機漢堡控制 ---------- */
+/* 老大需求 2026-06-04: 方案 B
+   - 桌面 ≥ 76.25em: 左側 sidebar 永久顯示, 不藏不打開就看到
+   - 手機 < 76.25em: drawer 從左滑出, 點 ≡ 開
+   - 兩者章節/附錄都顯示 (1-11 章 + 5 附錄)
+   - 漢堡按鈕在桌面也仍可 toggle (點一下收起, 再點打開)
+   - 主內容在桌面拿 sidebar 後的剩餘寬度 (不擠)
+   - 每個章節頁最頂部有「⌂ 回首頁」按鈕 (在內容區, 不是 sidebar) */
 
-/* 任何 viewport: sidebar 預設完全藏到螢幕外 */
-.md-sidebar--primary {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  width: 17rem !important;             /* 加寬給中文 (mkdocs 預設 12.1rem) */
-  height: 100% !important;
-  transform: translateX(-100%) !important;  /* 預設完全藏 */
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  z-index: 5 !important;
-  background: var(--md-default-bg-color, #fff) !important;
-  box-shadow: none !important;
-  overflow-y: auto !important;
-  visibility: hidden !important;        /* 雙保險: 漢堡未按時徹底不渲染 */
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-              visibility 0s linear 0.25s !important;
+/* ----- 手機 (< 76.25em): drawer 預設藏, 漢堡按時滑出 ----- */
+@media (max-width: 76.24em) {
+  .md-sidebar--primary {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 17rem !important;            /* 加寬給中文 */
+    height: 100% !important;
+    transform: translateX(-100%) !important;  /* 預設藏到螢幕外 */
+    z-index: 5 !important;
+    background: var(--md-default-bg-color, #fff) !important;
+    overflow-y: auto !important;
+    visibility: hidden !important;        /* 雙保險 */
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                visibility 0s linear 0.25s !important;
+  }
+  [data-md-toggle="drawer"]:checked ~ .md-container .md-sidebar--primary {
+    transform: translateX(0) !important;
+    visibility: visible !important;
+    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                visibility 0s linear 0s !important;
+    box-shadow: 0 0 24px rgba(0, 0, 0, 0.18) !important;
+  }
+  [data-md-toggle="drawer"]:checked ~ .md-overlay {
+    display: block !important;
+  }
 }
 
-/* 漢堡按鈕 (input#__drawer) 勾選時: drawer 滑進來 */
-[data-md-toggle="drawer"]:checked ~ .md-container .md-sidebar--primary {
-  transform: translateX(0) !important;
-  visibility: visible !important;
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-              visibility 0s linear 0s !important;
-  box-shadow: 0 0 24px rgba(0, 0, 0, 0.18) !important;
+/* ----- 桌面 (≥ 76.25em): sidebar 釘死永久顯示 ----- */
+@media (min-width: 76.25em) {
+  .md-sidebar--primary {
+    /* 釘死, 不動 transform, 不藏 */
+    position: sticky !important;
+    top: 4.6rem !important;               /* header 高度 */
+    width: 17rem !important;             /* 加寬給中文 */
+    height: calc(100vh - 4.6rem) !important;
+    overflow-y: auto !important;
+    visibility: visible !important;
+    background: var(--md-default-bg-color, #fff) !important;
+    transform: none !important;
+    box-shadow: none !important;
+  }
+  /* 覆寫 mkdocs HTML `hidden` 屬性 — 桌面要永久顯示 */
+  .md-sidebar--primary[hidden] {
+    display: block !important;            /* 強制顯示, 蓋掉 [hidden] 的 display: none */
+  }
+  /* 桌面 grid: 留 sidebar 寬度 (mkdocs 預設 grid) */
+  .md-grid {
+    grid-template-columns: 17rem 1fr !important;  /* [sidebar] [content] */
+  }
+  /* 桌面仍要讓漢堡按鈕可 toggle (user 可手動收合) */
+  /* 注意: [data-md-toggle="drawer"]:checked 會用 mkdocs 預設行為
+     把 sidebar 設 display: none, 我們要把這行為導向我們自寫的隱藏 */
+  [data-md-toggle="drawer"]:checked ~ .md-container .md-sidebar--primary {
+    transform: none !important;
+    visibility: visible !important;       /* 桌面釘死, 漢堡不能真的隱藏 */
+  }
 }
 
-/* drawer 開啟時背景遮罩 */
-[data-md-toggle="drawer"]:checked ~ .md-overlay {
-  display: block !important;
-}
-
-/* 確保漢堡按鈕 (header 內) 在 drawer 之上 */
+/* 確保漢堡按鈕在 drawer 之上 (手機) */
 .md-header__button.md-icon[for="__drawer"] {
   z-index: 10;
 }
 
-/* ---------- 內容區: 主內容拿 100% 寬度 (沒有 sidebar 預留空間) ---------- */
-/* mkdocs 預設 grid 會留 sidebar 寬度, 改用 1fr 拿滿 */
-@media (min-width: 76.25em) {
-  .md-grid {
-    grid-template-columns: 1fr !important;  /* 原本是 [sidebar] [content] [toc] */
-  }
-  /* TOC 預設右側, 維持原樣 */
-  .md-sidebar--secondary {
-    /* mkdocs 預設 display, 維持 */
-  }
-}
+/* 內容區桌面 grid 已在上方 `@media (min-width: 76.25em) { .md-grid }` 處理
+   (line ~525, grid-template-columns: 17rem 1fr) */

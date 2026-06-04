@@ -66,8 +66,11 @@ extra_css:
 
 extra_javascript:
   - assets/js/custom.js
-  - https://polyfill.io/v3/polyfill.min.js?features=es6
-  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+  # polyfill.io 已被 7+ 家瀏覽器/CDN 封鎖 (2024-06 Sansec 揭露 supply chain attack)
+  # mkdocs material 9.x 全 ES6+ 不需要 polyfill
+  # mathjax 站內 grep 0 hit 沒人用
+  # - https://polyfill.io/v3/polyfill.min.js?features=es6  # 2026-06-04 移除
+  # - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js  # 2026-06-04 移除 (沒人用)
 
 extra:
   social:
