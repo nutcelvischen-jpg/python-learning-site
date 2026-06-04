@@ -427,13 +427,14 @@
   background: linear-gradient(135deg, rgba(55, 118, 171, 0.15), rgba(255, 107, 53, 0.1));
 }
 
-/* ---------- Sidebar: 不管哪個 viewport, 統一由漢堡按鈕控制 ---------- */
-/* 老大需求: 方案 C — 桌面 / 手機都吃漢堡 toggle
-   - 桌面 ≥ 76.25em: 不再強制常駐顯示, 點 ≡ 開, 點 ✕ 收
-   - 手機 < 76.25em: 沿用 mkdocs 預設 (漢堡 toggle + transform 滑出)
-   - navigation.expand feature 已讓所有章節預設展開
-   - JS (custom.js) 把 .md-nav__toggle 設為 checked + disabled, 章節永遠展開不能收合
-   - 這裡只負責: 寬度 + 縮排 + 讓 md-nav__title 的 ✕ 收合 icon 視覺更明顯 */
+/* ---------- Sidebar: 桌面常駐 + 手機漢堡控制 ---------- */
+/* 老大需求: 簡單版
+   - 桌面 ≥ 76.25em: sidebar 永遠顯示 (1de1473 行為)
+   - 手機 < 76.25em: drawer 從左滑出, 點 ✕ 收 (a5e4434 加寬)
+   - 章節**可收合** (推翻 1de1473 "永遠展開不能收合", 恢復 mkdocs 預設折疊)
+   - navigation.expand feature 仍讓所有章節預設展開, 使用者可以再手動折疊
+   - JS (custom.js) 加 ⌂ 首頁按鈕, 不動章節 toggle
+   - 這裡只負責: 寬度 + 縮排 + 桌面常駐 + ⌂ 首頁按鈕樣式 */
 
 .md-sidebar--primary {
   width: 280px;
@@ -443,6 +444,14 @@
   padding-left: 0.6rem;  /* 子章節縮排 */
 }
 
+/* 桌面寬度 (>= 76.25em) 時 sidebar 永遠顯示 */
+@media (min-width: 76.25em) {
+  .md-sidebar--primary {
+    display: block !important;
+    visibility: visible !important;
+  }
+}
+
 /* 手機加寬, 預設 12.1rem 中文會擠 */
 @media (max-width: 76.25em) {
   .md-sidebar--primary {
@@ -450,61 +459,63 @@
   }
 }
 
-/* ---------- Sidebar 頂部 ✕ 收合按鈕 ----------
-   md-nav__title 是 mkdocs 預設的 for=__drawer label
-   整個 sidebar header (logo + 站名) 點下去都會切換漢堡按鈕 → 關 drawer
-   我們把這個 header 視覺化: 底部加 separator + 暗示這塊可以點擊
-   注意: 不動 font-size / text-transform, 保留原本的 "Python 學堂 · 從零到數據分析" 中文 */
+/* ---------- Sidebar 頂部: ⌂ 首頁 + ✕ 收合 雙按鈕 (JS 注入) ---------- */
+/* 視覺: 兩個 pill 按鈕, 左 ⌂ 首頁 (藍), 右 ✕ 收合 (灰)
+   位置: 插在 logo label (md-nav__title) 下方, 第一個章節之上 */
+.md-sidebar--primary .md-sidebar-top-buttons {
+  list-style: none;
+  margin: 0.4rem 0.5rem 0.6rem;
+  padding: 0;
+  display: flex;
+  gap: 0.4rem;
+}
 
+.md-sidebar--primary .md-top-btn {
+  flex: 1;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.6rem !important;
+  border-radius: 8px;
+  font-weight: 600 !important;
+  font-size: 0.85rem !important;
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, color 0.2s;
+  user-select: none;
+}
+
+.md-sidebar--primary .md-top-btn--home {
+  background: rgba(55, 118, 171, 0.10) !important;  /* python-blue 10% */
+  color: var(--python-blue, #3776AB) !important;
+}
+
+.md-sidebar--primary .md-top-btn--home:hover {
+  background: rgba(55, 118, 171, 0.20) !important;
+  transform: translateX(2px);
+}
+
+.md-sidebar--primary .md-top-btn--close {
+  background: rgba(71, 85, 105, 0.08) !important;  /* ink-gray 8% */
+  color: var(--ink-gray, #475569) !important;
+}
+
+.md-sidebar--primary .md-top-btn--close:hover {
+  background: rgba(255, 107, 53, 0.15) !important;  /* hover 變橘色 */
+  color: var(--creative-orange, #FF6B35) !important;
+}
+
+.md-sidebar--primary .md-top-btn__icon {
+  font-size: 1.05rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* ---------- Sidebar 頂部: logo label 微調 (跟雙按鈕有視覺分界) ---------- */
 .md-sidebar--primary .md-nav__title {
   border-bottom: 1px solid var(--line-soft, #E2E8F0);
   padding: 0.5rem 0.8rem !important;
-  cursor: pointer;
   background: var(--paper-white, #FAFBFC);
   user-select: none;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  transition: background 0.2s;
-}
-
-.md-sidebar--primary .md-nav__title:hover {
-  background: var(--md-accent-fg-color--transparent, rgba(255, 107, 53, 0.08));
-}
-
-/* ✕ 收合 icon: 用 ::after 在右側加一個明顯的 ✕ */
-.md-sidebar--primary .md-nav__title::after {
-  content: "✕";
-  font-size: 1.1rem;
-  font-weight: 400;
-  color: var(--ink-gray, #475569);
-  opacity: 0.5;
-  transition: opacity 0.2s, color 0.2s, transform 0.2s;
-  flex-shrink: 0;
-  margin-left: auto;
-  padding-left: 0.5rem;
-}
-
-.md-sidebar--primary .md-nav__title:hover::after {
-  opacity: 1;
-  color: var(--creative-orange, #FF6B35);
-  transform: scale(1.2);
-}
-
-/* 桌面: 預設 mkdocs 把 md-nav__title display: none (因為桌面用常駐 sidebar 不需要關)
-   方案 C 後桌面也走漢堡 toggle, 所以要顯示這個 header */
-@media (min-width: 76.25em) {
-  .md-sidebar--primary .md-nav__title {
-    display: flex !important;
-    align-items: center;
-  }
-}
-
-/* ---------- Sidebar: 章節永遠展開, 不能收合 ---------- */
-/* JS (custom.js) 會把所有 .md-nav__toggle checkbox 設為 checked + disabled,
-   這裡只負責把右邊的折疊箭頭藏起來, 視覺上更乾淨 */
-
-.md-sidebar--primary .md-nav__item--section > .md-nav__link::after,
-.md-sidebar--primary .md-nav__item--section > label.md-nav__link::after {
-  display: none !important;
 }
