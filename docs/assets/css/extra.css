@@ -296,18 +296,19 @@
 }
 
 /* 「⌂ 回首頁」按鈕 (JS 注入到 lesson-header 最前面)
-   視覺: pill 形狀, 藍色, hover 加深, sticky 永遠在章節頂部
-   老大需求: Apple.com 風格, 每個章節最頂部有回首頁按鈕 */
+   視覺: pill 形狀, 藍色, hover 加深
+   老大需求: Apple.com 風格, 每個章節最頂部有回首頁按鈕
+   v2: 按鈕獨佔一行, 不跟 chapter-tag 擠同一行 */
 .lesson-home-btn {
   display: inline-flex !important;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.35rem 0.8rem !important;
-  margin-bottom: 0.8rem;
+  padding: 0.4rem 0.9rem !important;
+  margin-bottom: 1rem;            /* 跟 chapter-tag 拉開 */
   background: var(--python-blue, #3776AB) !important;
   color: #ffffff !important;
   border-radius: 999px;
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 600;
   text-decoration: none !important;
   box-shadow: 0 1px 3px rgba(55, 118, 171, 0.25);
@@ -323,9 +324,10 @@
 }
 
 .lesson-home-btn__icon {
-  font-size: 1rem;
+  font-size: 1.05rem;
   line-height: 1;
   flex-shrink: 0;
+  font-weight: 700;              /* ← 比較粗比較明顯 */
 }
 
 .lesson-home-btn__text {

@@ -55,7 +55,7 @@
     btn.setAttribute('aria-label', '回首頁');
     btn.title = '回首頁';
     btn.innerHTML =
-      '<span class="lesson-home-btn__icon" aria-hidden="true">⌂</span>' +
+      '<span class="lesson-home-btn__icon" aria-hidden="true">←</span>' +
       '<span class="lesson-home-btn__text">回首頁</span>';
 
     // 插到 lesson-header 最前面 (在 .chapter-tag / h1 之上)
