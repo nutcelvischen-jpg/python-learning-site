@@ -168,7 +168,7 @@ plt.savefig('chart2_county_ranking.png', dpi=120)
 plt.show()
 ```
 
-![縣市 AQI 排名](../assets/images/chart2_county_aqi_ranking.png)
+![縣市 AQI 排名](../assets/images/chart2_county_aqi_rank.png)
 
 !!! question "為什麼新北市 / 桃園市最高？"
 
@@ -359,7 +359,7 @@ plt.savefig('chart5_correlation.png', dpi=120)
 plt.show()
 ```
 
-![相關性分析](../assets/images/chart5_price_air_correlation.png)
+![相關性分析](../assets/images/chart5_house_aqi_regression.png)
 
 ## 🎓 Step 9 — 研究結論與政策建議
 

@@ -3,6 +3,9 @@
    Inspired by Open Design 0.9.0 (clean + creative)
    ============================================================ */
 
+/* ---------- Webfont (Noto Sans TC) ---------- */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap');
+
 /* ---------- Design Tokens ---------- */
 :root {
   /* Open Design-inspired palette */
