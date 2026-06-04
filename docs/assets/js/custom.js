@@ -17,63 +17,55 @@
   });
 })();
 
-/* Sidebar: 頂部 ⌂ 首頁 + ✕ 收合 雙按鈕 (JS 注入)
-   mkdocs 預設 sidebar 頂部是 label.md-nav__title[for=__drawer] (logo + 站名)
-   點它會 toggle drawer (桌面的常駐 sidebar 不受影響)
-   我們在 logo label 下方插入一排兩個獨立按鈕:
-     - ⌂ 首頁: 直接回首頁 (a 連結)
-     - ✕ 收合: 點下去 toggle drawer (label[for=__drawer], 視覺上跟漢堡按鈕同步)
+/* (Apple.com 風格) 不再注入 sidebar 內按鈕
+   漢堡按鈕 = 唯一 toggle, 點 logo 不回首頁
+   「⌂ 回首頁」按鈕由 lesson-header 模板在內容區頂部提供 */
 
-   注意: 桌面常駐 sidebar 時, 這兩按鈕仍顯示 (一致勝過聰明, 老大要求簡單)
-
-   改用 MutationObserver 監聽, 處理 Telegram in-app browser / 慢載入情境 */
+/* 在每個章節頁 .lesson-header 內頂部加一個「⌂ 回首頁」按鈕
+   老大需求: Apple.com 風格, 每個章節最頂部有回首頁按鈕
+   注意: 跳過首頁 (/) 跟附錄/intro 等非章節頁 (沒 .lesson-header) */
 (function() {
-  function addTopButtons() {
-    var sidebar = document.querySelector('.md-sidebar--primary .md-nav--primary');
-    if (!sidebar) return;
-    if (sidebar.querySelector('.md-sidebar-top-buttons')) return;  // 避免重複
+  function addHomeToLessonHeader() {
+    var header = document.querySelector('.md-content .lesson-header');
+    if (!header) return;  // 首頁/附錄/intro 沒 lesson-header, 跳過
+    if (header.querySelector('.lesson-home-btn')) return;  // 避免重複
 
-    var siteRoot = document.querySelector('a.md-header__button.md-logo');
-    siteRoot = siteRoot ? siteRoot.getAttribute('href') : './';
-
-    // 包在一個 li 裡, 跟其他 md-nav__item 同級, 視覺一致
-    var container = document.createElement('li');
-    container.className = 'md-nav__item md-sidebar-top-buttons';
-    container.innerHTML =
-      '<a href="' + siteRoot + '" class="md-nav__link md-top-btn md-top-btn--home" title="回首頁">' +
-        '<span class="md-top-btn__icon" aria-hidden="true">⌂</span>' +
-        '<span class="md-ellipsis">回首頁</span>' +
-      '</a>' +
-      '<label class="md-nav__link md-top-btn md-top-btn--close" for="__drawer" title="收合選單">' +
-        '<span class="md-top-btn__icon" aria-hidden="true">✕</span>' +
-        '<span class="md-ellipsis">收合</span>' +
-      '</label>';
-
-    // 插在第一個章節 li 之前 (logo label 之後)
-    var firstNavItem = sidebar.querySelector('ul.md-nav__list > li');
-    if (firstNavItem && firstNavItem.parentNode) {
-      firstNavItem.parentNode.insertBefore(container, firstNavItem);
-    } else {
-      sidebar.insertBefore(container, sidebar.firstChild);
+    var logoHref = document.querySelector('a.md-header__button.md-logo');
+    var siteRoot = logoHref ? logoHref.getAttribute('href') : './';
+    // 確保是絕對路徑 (含 /)
+    if (siteRoot === '.' || siteRoot === '') siteRoot = './';
+    // 從 logo href 推回網站根 (logo 永遠指向首頁)
+    // mkdocs 內 logo href 通常是 "." 或 ".." 或 "/"
+    // 統一: 如果不是以 / 開頭, 改用 ./
+    if (!siteRoot.startsWith('/') && !siteRoot.startsWith('http')) {
+      siteRoot = './';
     }
+
+    var btn = document.createElement('a');
+    btn.href = siteRoot;
+    btn.className = 'lesson-home-btn';
+    btn.setAttribute('aria-label', '回首頁');
+    btn.title = '回首頁';
+    btn.innerHTML =
+      '<span class="lesson-home-btn__icon" aria-hidden="true">⌂</span>' +
+      '<span class="lesson-home-btn__text">回首頁</span>';
+
+    // 插到 lesson-header 最前面 (在 .chapter-tag / h1 之上)
+    header.insertBefore(btn, header.firstChild);
   }
 
-  // 三重保險: DOMContentLoaded + load + MutationObserver
+  // 三重保險 (含 MutationObserver 處理 SPA / 慢載入)
   function tryInject() {
-    addTopButtons();
+    addHomeToLessonHeader();
   }
   document.addEventListener('DOMContentLoaded', tryInject);
   window.addEventListener('load', tryInject);
 
-  // MutationObserver: 監聽 sidebar 是否被加進 DOM (處理 SPA-like / 慢載入 / Telegram in-app browser)
   if (typeof MutationObserver !== 'undefined') {
-    var observer = new MutationObserver(function(mutations) {
-      if (document.querySelector('.md-sidebar--primary .md-nav--primary')) {
-        addTopButtons();
-      }
+    var observer = new MutationObserver(function() {
+      addHomeToLessonHeader();
     });
     observer.observe(document.documentElement, { childList: true, subtree: true });
-    // 10 秒後停止觀察 (避免一直跑)
     setTimeout(function() { observer.disconnect(); }, 10000);
   }
 })();

@@ -295,6 +295,43 @@
   border-radius: 0 0 16px 16px;
 }
 
+/* 「⌂ 回首頁」按鈕 (JS 注入到 lesson-header 最前面)
+   視覺: pill 形狀, 藍色, hover 加深, sticky 永遠在章節頂部
+   老大需求: Apple.com 風格, 每個章節最頂部有回首頁按鈕 */
+.lesson-home-btn {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.8rem !important;
+  margin-bottom: 0.8rem;
+  background: var(--python-blue, #3776AB) !important;
+  color: #ffffff !important;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: none !important;
+  box-shadow: 0 1px 3px rgba(55, 118, 171, 0.25);
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  width: fit-content;
+}
+
+.lesson-home-btn:hover {
+  background: #2C5F8F !important;
+  color: #ffffff !important;
+  transform: translateX(2px);
+  box-shadow: 0 2px 6px rgba(55, 118, 171, 0.35);
+}
+
+.lesson-home-btn__icon {
+  font-size: 1rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.lesson-home-btn__text {
+  line-height: 1;
+}
+
 .lesson-header .chapter-tag {
   display: inline-block;
   padding: 0.25rem 0.75rem;
@@ -427,115 +464,61 @@
   background: linear-gradient(135deg, rgba(55, 118, 171, 0.15), rgba(255, 107, 53, 0.1));
 }
 
-/* ---------- Sidebar: 桌面常駐 + 手機漢堡控制 ---------- */
-/* 老大需求: 簡單版
-   - 桌面 ≥ 76.25em: sidebar 永遠顯示 (1de1473 行為)
-   - 手機 < 76.25em: drawer 從左滑出, 點 ✕ 收 (a5e4434 加寬)
-   - 章節**可收合** (推翻 1de1473 "永遠展開不能收合", 恢復 mkdocs 預設折疊)
-   - navigation.expand feature 仍讓所有章節預設展開, 使用者可以再手動折疊
-   - JS (custom.js) 加 ⌂ 首頁按鈕, 不動章節 toggle
-   - 這裡只負責: 寬度 + 縮排 + 桌面常駐 + ⌂ 首頁按鈕樣式 */
+/* ---------- Sidebar: 桌面/手機統一, 預設完全隱藏 ---------- */
+/* 老大需求: Apple.com 風格
+   - 不管桌面/手機, 預設完全無 sidebar
+   - 主內容拿 100% 寬度
+   - 漢堡按鈕未按時, 畫面只剩主內容 + header ≡
+   - 漢堡按鈕按下, drawer 從左滑出含 11 章節 + 5 附錄 + 開始之前
+   - 每個章節頁最頂部有「⌂ 回首頁」按鈕 (在內容區, 不是 sidebar)
+   - 這裡只負責: 統一 drawer 寬度 + 隱藏邏輯 + 動畫
+   - 桌面 ≥ 76.25em 跟手機 < 76.25em 用同一套 CSS (不再各自分媒體) */
 
+/* 任何 viewport: sidebar 預設完全藏到螢幕外 */
 .md-sidebar--primary {
-  width: 280px;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 17rem !important;             /* 加寬給中文 (mkdocs 預設 12.1rem) */
+  height: 100% !important;
+  transform: translateX(-100%) !important;  /* 預設完全藏 */
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  z-index: 5 !important;
+  background: var(--md-default-bg-color, #fff) !important;
+  box-shadow: none !important;
+  overflow-y: auto !important;
+  visibility: hidden !important;        /* 雙保險: 漢堡未按時徹底不渲染 */
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              visibility 0s linear 0.25s !important;
 }
 
-.md-sidebar--primary .md-nav__list .md-nav__list {
-  padding-left: 0.6rem;  /* 子章節縮排 */
+/* 漢堡按鈕 (input#__drawer) 勾選時: drawer 滑進來 */
+[data-md-toggle="drawer"]:checked ~ .md-container .md-sidebar--primary {
+  transform: translateX(0) !important;
+  visibility: visible !important;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              visibility 0s linear 0s !important;
+  box-shadow: 0 0 24px rgba(0, 0, 0, 0.18) !important;
 }
 
-/* 桌面寬度 (>= 76.25em) 時 sidebar 永遠顯示 */
+/* drawer 開啟時背景遮罩 */
+[data-md-toggle="drawer"]:checked ~ .md-overlay {
+  display: block !important;
+}
+
+/* 確保漢堡按鈕 (header 內) 在 drawer 之上 */
+.md-header__button.md-icon[for="__drawer"] {
+  z-index: 10;
+}
+
+/* ---------- 內容區: 主內容拿 100% 寬度 (沒有 sidebar 預留空間) ---------- */
+/* mkdocs 預設 grid 會留 sidebar 寬度, 改用 1fr 拿滿 */
 @media (min-width: 76.25em) {
-  .md-sidebar--primary {
-    display: block !important;
-    visibility: visible !important;
+  .md-grid {
+    grid-template-columns: 1fr !important;  /* 原本是 [sidebar] [content] [toc] */
   }
-}
-
-/* 手機加寬, 預設 12.1rem 中文會擠 */
-@media (max-width: 76.25em) {
-  .md-sidebar--primary {
-    width: 17rem !important;
-    /* 關鍵: mkdocs 預設 left: -12.1rem + 我們 width: 17rem → 有 4.9rem 露在螢幕外
-       解法: 改 left: 0 + transform: translateX(-100%) → 整個 17rem 完整推離螢幕 */
-    left: 0 !important;
-    transform: translateX(-100%) !important;
-    transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  /* TOC 預設右側, 維持原樣 */
+  .md-sidebar--secondary {
+    /* mkdocs 預設 display, 維持 */
   }
-
-  /* 漢堡按鈕 (input#__drawer) 勾選時, drawer 滑進來 */
-  [data-md-toggle="drawer"]:checked ~ .md-container .md-sidebar--primary {
-    transform: translateX(0) !important;
-  }
-
-  /* drawer 開啟時背景遮罩 */
-  [data-md-toggle="drawer"]:checked ~ .md-overlay {
-    display: block !important;
-  }
-
-  /* 確保漢堡按鈕在 drawer 之上 (z-index 5), 桌面固定看到 */
-  .md-header__button.md-icon[for="__drawer"] {
-    z-index: 10;
-  }
-}
-
-/* ---------- Sidebar 頂部: ⌂ 首頁 + ✕ 收合 雙按鈕 (JS 注入) ---------- */
-/* 視覺: 兩個 pill 按鈕, 左 ⌂ 首頁 (藍), 右 ✕ 收合 (灰)
-   位置: 插在 logo label (md-nav__title) 下方, 第一個章節之上 */
-.md-sidebar--primary .md-sidebar-top-buttons {
-  list-style: none;
-  margin: 0.4rem 0.5rem 0.6rem;
-  padding: 0;
-  display: flex;
-  gap: 0.4rem;
-}
-
-.md-sidebar--primary .md-top-btn {
-  flex: 1;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  padding: 0.5rem 0.6rem !important;
-  border-radius: 8px;
-  font-weight: 600 !important;
-  font-size: 0.85rem !important;
-  text-decoration: none !important;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.15s, color 0.2s;
-  user-select: none;
-}
-
-.md-sidebar--primary .md-top-btn--home {
-  background: rgba(55, 118, 171, 0.10) !important;  /* python-blue 10% */
-  color: var(--python-blue, #3776AB) !important;
-}
-
-.md-sidebar--primary .md-top-btn--home:hover {
-  background: rgba(55, 118, 171, 0.20) !important;
-  transform: translateX(2px);
-}
-
-.md-sidebar--primary .md-top-btn--close {
-  background: rgba(71, 85, 105, 0.08) !important;  /* ink-gray 8% */
-  color: var(--ink-gray, #475569) !important;
-}
-
-.md-sidebar--primary .md-top-btn--close:hover {
-  background: rgba(255, 107, 53, 0.15) !important;  /* hover 變橘色 */
-  color: var(--creative-orange, #FF6B35) !important;
-}
-
-.md-sidebar--primary .md-top-btn__icon {
-  font-size: 1.05rem;
-  line-height: 1;
-  flex-shrink: 0;
-}
-
-/* ---------- Sidebar 頂部: logo label 微調 (跟雙按鈕有視覺分界) ---------- */
-.md-sidebar--primary .md-nav__title {
-  border-bottom: 1px solid var(--line-soft, #E2E8F0);
-  padding: 0.5rem 0.8rem !important;
-  background: var(--paper-white, #FAFBFC);
-  user-select: none;
 }

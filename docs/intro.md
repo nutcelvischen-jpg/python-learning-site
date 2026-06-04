@@ -2,7 +2,10 @@
 title: 開始之前
 ---
 
-# 開始之前
+<div class="lesson-header">
+  <span class="chapter-tag">課前導讀</span>
+  <h1>開始之前</h1>
+</div>
 
 歡迎來到 **Python 學堂**！ 在開始寫第一行程式碼之前，赫哥想先跟你聊聊這門課的設計理念。
 
