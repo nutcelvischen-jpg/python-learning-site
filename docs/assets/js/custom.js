@@ -23,26 +23,34 @@
 
 /* 在每個章節頁 .lesson-header 內頂部加一個「⌂ 回首頁」按鈕
    老大需求: Apple.com 風格, 每個章節最頂部有回首頁按鈕
-   注意: 跳過首頁 (/) 跟附錄/intro 等非章節頁 (沒 .lesson-header) */
+   注意: 跳過首頁 (/) 跟附錄/intro 等非章節頁 (沒 .lesson-header)
+
+   重要: href 必須是 GitHub Pages 部署的絕對路徑 /python-learning-site/
+   因為 GitHub Pages 站點部署在 https://.../python-learning-site/ 子路徑
+   從任何子目錄 (chapter0X_setup/01-why-python/) 用 ./ 都會跳到同層而非根
+   用 /python-learning-site/ 是最穩的「回首頁」寫法 */
 (function() {
   function addHomeToLessonHeader() {
     var header = document.querySelector('.md-content .lesson-header');
-    if (!header) return;  // 首頁/附錄/intro 沒 lesson-header, 跳過
+    if (!header) return;  // 首頁/intro 沒 lesson-header, 跳過
     if (header.querySelector('.lesson-home-btn')) return;  // 避免重複
 
-    var logoHref = document.querySelector('a.md-header__button.md-logo');
-    var siteRoot = logoHref ? logoHref.getAttribute('href') : './';
-    // 確保是絕對路徑 (含 /)
-    if (siteRoot === '.' || siteRoot === '') siteRoot = './';
-    // 從 logo href 推回網站根 (logo 永遠指向首頁)
-    // mkdocs 內 logo href 通常是 "." 或 ".." 或 "/"
-    // 統一: 如果不是以 / 開頭, 改用 ./
-    if (!siteRoot.startsWith('/') && !siteRoot.startsWith('http')) {
-      siteRoot = './';
+    // 動態計算回首頁的相對路徑
+    // mkdocs material 已經把 logo href 算成正確的相對路徑 (例 chapter0X_setup/01-why-python/ 的 logo href=../..)
+    // 從 logo href 拿, 自動處理所有子目錄層級, 不需要自己算
+    var logoEl = document.querySelector('a.md-header__button.md-logo');
+    var homeHref = './';  // fallback
+    if (logoEl) {
+      var href = logoEl.getAttribute('href');
+      // mkdocs 給的 href 一定是 . 或 ./ 或 ../ 開頭的相對路徑
+      // 如果是 . 開頭, 我們要的是 logo 指向的目標 (首頁), 保留原樣
+      if (href && href !== '') {
+        homeHref = href;
+      }
     }
 
     var btn = document.createElement('a');
-    btn.href = siteRoot;
+    btn.href = homeHref;
     btn.className = 'lesson-home-btn';
     btn.setAttribute('aria-label', '回首頁');
     btn.title = '回首頁';
